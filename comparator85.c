@@ -20,28 +20,55 @@
 #define clrWithMask(reg, mask) ( (reg) &= ~(mask) )
 
 
+void
+setup(void) {
+    crlPortRegAndSetAsOutPB4();
+    disable_ADC();
+    enable_comparator_multiplexed_input();
+    select_ADC_input_channel( _ADCpin ); }//
+
+
+void
+crlPortRegAndSetAsOutPB4(void) {
+    PORTB = 0x00;
+    DDRB |= (1 << PB4); }// PB4 as LED out
+
+
+void
+disable_ADC(void) {
+    clrBit(ADCSRA, ADEN); }//
+
+
+void
+enable_comparator_multiplexed_input(void) {
+    setBit(ADCSRB, ACME); }//
+
+
+void
+select_ADC_input_channel(unsigned char _ADCpin) {
+    clrWithMask( ADMUX, 0x03 );     // clr MUX[1:0]
+    setWithMask( ADMUX, _ADCpin ); }// set MUX[1:0]
+
+
+unsigned char
+isComparatorHigh(void) {
+    return getBit(ACSR,ACO); }//
 
 
 int main(void) {
 
-    DDRB |= (1 << PB4);     // PB4 as LED out
-    PORTB = 0x00;
-
-    ADCSRA &= ~(1 << ADEN); // disable ADC (clr bit)
-    ADCSRB |=  (1 << ACME); // enable comparator multiplexed input (set bit)
-    ADMUX &= ~0x03;         // clr MUX[1:0]
-    ADMUX |=  3;            // set MUX[1:0], select ADC3 as AIN1 
+    setup();
 
     while(1) {
 
-        if ( getBit(ACSR,ACO) )
+        if ( isComparatorHigh() )
             setBit( PORTB, PB4 );
 
         else
             clrBit( PORTB, PB4 );
         }
 
-    } // main
+    }// main
 
 
 /* END */
