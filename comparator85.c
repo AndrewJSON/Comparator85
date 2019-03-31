@@ -21,14 +21,6 @@
 
 
 void
-setup(void) {
-    crlPortRegAndSetAsOutPB4();
-    disable_ADC();
-    enable_comparator_multiplexed_input();
-    select_ADC_input_channel( _ADCpin ); }//
-
-
-void
 crlPortRegAndSetAsOutPB4(void) {
     PORTB = 0x00;
     DDRB |= (1 << PB4); }// PB4 as LED out
@@ -48,6 +40,14 @@ void
 select_ADC_input_channel(unsigned char _ADCpin) {
     clrWithMask( ADMUX, 0x03 );     // clr MUX[1:0]
     setWithMask( ADMUX, _ADCpin ); }// set MUX[1:0]
+
+
+void
+setup(void) {
+    crlPortRegAndSetAsOutPB4();
+    disable_ADC();
+    enable_comparator_multiplexed_input();
+    select_ADC_input_channel( 3 ); }//
 
 
 unsigned char
